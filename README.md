@@ -10,7 +10,7 @@ If using conda for package management, the following command creates a new envir
 To install the package via a symlink to the git directory, use ```python setup.py develop```.
 
 ## Using the package
-Examples of how to use the model and its plotting functions are contained in an iPython notebook, see *Examples.ipynb*.
+Examples of how to use the model and its plotting functions are contained in an iPython notebook, see *Tutorial.ipynb*.
 
 ## Enquiries
 
