@@ -17,4 +17,4 @@ Examples of further applications of the model can be found at https://github.com
 ## Enquiries
 
 Questions, comments and suggestions can be e-mailed to r.siqueiradesouza@sheffield.ac.uk from https://activetou.ch/. 
-For questions, comments and suggestions directly related to simulating responses during walking, email ldcleland1@sheffield.ac.uk from https://activetou.ch/.
+For questions, comments and suggestions directly related to simulating responses during walking, email Luke Cleland at ldcleland1@sheffield.ac.uk from https://activetou.ch/.
