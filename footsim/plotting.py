@@ -3,8 +3,8 @@ import re
 import numpy as np
 import warnings
 from math import ceil
-
-hv.notebook_extension('matplotlib')
+hv.extension('matplotlib')
+# hv.notebook_extension('matplotlib')
 #hv.notebook_extension('bokeh')
  
 from .classes import Afferent,AfferentPopulation,Stimulus,Response
@@ -66,8 +66,9 @@ def plot_afferent_population(obj,**args):
     for a in Afferent.affclasses:
         p = hv.Points(
             obj.surface.hand2pixel(obj.location[obj.find(a),:]))
-        points[a] = p.opts(plot=dict(aspect='equal'),
-            style=dict(color=tuple(Afferent.affcol[a])))
+        # points[a] = p.options(plot=dict(aspect='equal'),
+        #     style=dict(color=tuple(Afferent.affcol[a])))
+        points[a] = p.options(aspect='equal', color=tuple(Afferent.affcol[a]))
     return hv.NdOverlay(points)
 
 def plot_stimulus(obj,**args):
@@ -110,11 +111,11 @@ def plot_stimulus(obj,**args):
         hm = dict()
         locs = sur.hand2pixel(obj.location)
         rad = obj.pin_radius*sur.pxl_per_mm
-        for t in range(num):
+        for t in range(num):   
             p = hv.Polygons([{('x','y'):hv.Ellipse(locs[l,0],locs[l,1],2*rad).array(),
-                'z':d[l,t]} for l in range(obj.location.shape[0])],vdims='z').opts(
-                plot=dict(color_index='z',aspect='equal'),
-                style=dict(linewidth=0.,line_width=0.01)).options(cmap='fire')
+                    'z':d[l,t]} for l in range(obj.location.shape[0])], vdims='z').options(
+                    color=hv.dim('z'), aspect='equal',
+                    linewidth=0.01, cmap='fire')
             hm[t] = p
         hvobj = hv.HoloMap(hm,kdims='Time bin [' + str(bin) + ' ms]')
     return hvobj
@@ -126,10 +127,11 @@ def plot_response(obj,**args):
         spikes = dict()
         for i in range(len(idx)):
             s = hv.Spikes(obj.spikes[idx[i]], kdims=['Time'])
-            spikes[i] = s.opts(plot=dict(position=0.1*i,spike_length=0.1),
-                style=dict(color=tuple(
-                Afferent.affcol[obj.aff.afferents[idx[i]].affclass])))
-        hvobj = hv.NdOverlay(spikes).opts(plot=dict(yaxis=None))
+            #changed this
+            spikes[i] = s.options(position=0.1*i,spike_length=0.1,
+                color=tuple(
+                Afferent.affcol[obj.aff.afferents[idx[i]].affclass]))
+        hvobj = hv.NdOverlay(spikes).options(yaxis=None)
 
     else:
         scale = args.get('scale',True)
@@ -151,11 +153,11 @@ def plot_response(obj,**args):
 #                    obj.aff.location[idx,:]),
 #                    r[idx,t:t+1]],axis=1),vdims=['Firing rate'])
 #                if scale:
-#                    points[a] = p.opts(style=dict(color=tuple(Afferent.affcol[a])),
+#                    points[a] = p.options(style=dict(color=tuple(Afferent.affcol[a])),
 #                        plot=dict(size_index=2,scaling_factor=scaling_factor,
 #                        aspect='equal'))
 #                else:
-#                    points[a] = p.opts(plot=dict(color_index=2,aspect='equal')
+#                    points[a] = p.options(plot=dict(color_index=2,aspect='equal')
 #                        ).options(cmap='fire_r')
                     
             
@@ -163,15 +165,13 @@ def plot_response(obj,**args):
                     points[a] = hv.Points(np.concatenate(
                     [obj.aff.surface.hand2pixel(
                     obj.aff.location[idx,:]),
-                    r[idx,t:t+1]],axis=1),vdims=['Firing rate']).opts(style=dict(color=tuple(Afferent.affcol[a])),
-                        plot=dict(size_index=2,scaling_factor=scaling_factor,
-                        aspect='equal'))
+                    r[idx,t:t+1]],axis=1),vdims=['Firing rate']).options(color=tuple(Afferent.affcol[a]), size_index=2,scaling_factor=scaling_factor,
+                        aspect='equal')
                 else:
                     points[a] = hv.Points(np.concatenate(
                     [obj.aff.surface.hand2pixel(
                     obj.aff.location[idx,:]),
-                    r[idx,t:t+1]],axis=1),vdims=['Firing rate']).opts(plot=dict(color_index=2,aspect='equal')
-                        ).options(cmap='fire_r')
+                    r[idx,t:t+1]],axis=1),vdims=['Firing rate']).options(color_index=2,aspect='equal').options(cmap='fire_r')
                     
             hm[t] = hv.NdOverlay(points)
         hvobj = hv.HoloMap(hm,kdims='Time bin [' + str(bin) + ' ms]')
@@ -190,9 +190,9 @@ def plot_surface(obj,**args):
     wh = amax-amin
     if np.min(wh)<250:
         wh = wh/np.min(wh)*250
-    hvobj = hv.Path([obj.boundary[i] for i in idx]).opts(
-        style=dict(color='k'),plot=dict(yaxis=None,xaxis=None,aspect='equal',
-        width=int(ceil(wh[0])),height=int(ceil(wh[1]))))
+    hvobj = hv.Path([obj.boundary[i] for i in idx]).options(
+        color='k',yaxis=None,xaxis=None,aspect='equal')
+        #width=int(ceil(wh[0])),height=int(ceil(wh[1])))
 
     if fill is not None:
         vals = np.nan*np.zeros((obj.num,))
@@ -206,8 +206,8 @@ def plot_surface(obj,**args):
         im = np.nan*np.zeros(tuple((imax-imin+1)[::-1].tolist()))
         for i in idx:
             im[obj._coords[i][:,1]-imin[1],obj._coords[i][:,0]-imin[0]] = vals[i]
-        hvobj = hv.Image(np.flipud(im),bounds=(imin[0],imin[1],imax[0],imax[1])).opts(
-            plot=dict(yaxis=None,xaxis=None))
+        hvobj = hv.Image(np.flipud(im),bounds=(imin[0],imin[1],imax[0],imax[1])).options(
+            yaxis=None,xaxis=None)
 
     if coord is not None:
         hvobj *= hv.Curve([obj.hand2pixel((0,0)),obj.hand2pixel((coord,0))]) *\

@@ -396,8 +396,28 @@ def stim_noise(**args):
 
     return Stimulus(trace=trace,location=loc,fs=fs,**args)
 
+def stim_linear(len_prev, **args): # written by Pranay Dang
+    amp = args.pop('amp',.03)
+    len = args.pop('len',0.01)
+    loc = np.array(args.pop('loc',default_params['loc']))
+    fs = args.pop('fs',default_params['fs'])
+    pre_indent = args.pop('pre_indent',default_params['pre_indent'])
+    pad_len = args.pop('pad_len',default_params['pad_len'])
+
+    time_step = 0.01 # in seconds
+    n = time_step*fs
+
+    trace = np.linspace(len_prev, len_prev+amp, int(n))
+
+    if pad_len>0:
+        trace = apply_pad(trace,pad_len=pad_len,fs=fs)
+    trace += pre_indent
+
+    return Stimulus(trace=trace,location=loc,fs=fs,**args)
+
 
 def stim_impulse(**args):
+    
     """Generates a short impulse to the skin.
 
     Kwargs:
